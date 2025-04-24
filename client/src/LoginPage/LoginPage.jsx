@@ -64,12 +64,12 @@ const LoginPage = () => {
   };
 
   useEffect(() => {
-    // navigator.geolocation.getCurrentPosition(
-    //   onSuccess,
-    //   onError,
-    //   locationOptions
-    // );
-    onSuccess(getFakeLocation());
+    navigator.geolocation.getCurrentPosition(
+      onSuccess,
+      onError,
+      locationOptions
+    );
+    // onSuccess(getFakeLocation());
   }, []);
   useEffect(() => {
     if (myLocation) {

@@ -186,6 +186,7 @@ const MapPage = () => {
           socketId={selectedUser.socketId}
           username={selectedUser.username}
           userLocation={selectedUser.coords}
+          onClose={() => setSelectedUser(null)}
         />
       )}
     </LoadScript>

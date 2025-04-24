@@ -28,9 +28,10 @@ io.on("connection", (socket) => {
 
   socket.on(`user-login`, (data) => loginEventHandler(socket, data));
 
+  socket.on("chat-message", (data) => chatMessageHandler(socket, data));
+  
   socket.on("disconnect", () => {
     disconnectEventHandler(socket.id);
-    
   });
 });
 const PORT = process.env.PORT || 3003;
@@ -42,9 +43,22 @@ server.listen(PORT, () => {
 const disconnectEventHandler = (id) => {
   console.log(`user disconnected of the id:${id}`);
   removeOnlineUser(id);
-  broadcastDisconnectedUserDetails(id)
+  broadcastDisconnectedUserDetails(id);
 };
 
+const chatMessageHandler = (socket, data) => {
+  const { receiverSocketId, content, id } = data;
+
+  if (onlineUsers[receiverSocketId]) {
+    console.log('message received',data);
+    console.log('sending message to');
+    io.to(receiverSocketId).emit("chat-message", {
+      senderSocketId: socket.id,
+      content,
+      id,
+    });
+  }
+};
 const removeOnlineUser = (id) => {
   if (onlineUsers[id]) {
     delete onlineUsers[id];
@@ -52,9 +66,9 @@ const removeOnlineUser = (id) => {
   console.log(onlineUsers);
 };
 
-const broadcastDisconnectedUserDetails =(disconnectedUserSocketId)=>{
-  io.to('logged-users').emit('user-disconnected', disconnectedUserSocketId)
-}
+const broadcastDisconnectedUserDetails = (disconnectedUserSocketId) => {
+  io.to("logged-users").emit("user-disconnected", disconnectedUserSocketId);
+};
 
 const loginEventHandler = (socket, data) => {
   socket.join("logged-users");
@@ -73,7 +87,7 @@ const convertOnlineUsersToArray = () => {
 
   Object.entries(onlineUsers).forEach(([key, value]) => {
     onlineUsersArray.push({
-      socketId:key,
+      socketId: key,
       username: value.username,
       coords: value.coords,
     });
